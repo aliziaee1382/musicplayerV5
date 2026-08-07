@@ -10,10 +10,15 @@ workflows:
           touch .env.example
           touch .env
 
-          # 2. اعطای دسترسی اجرایی به فایل gradlew
-          chmod +x gradlew
+          # 2. تولید کلید امضای Debug
+          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
-          # 3. اجرای دستور ساخت APK نسخه Debug
-          ./gradlew assembleDebug
+          # 3. دانلود و تنظیم Gradle
+          curl -sL https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o gradle-9.3.1-bin.zip
+          unzip -q gradle-9.3.1-bin.zip
+          export PATH=$(pwd)/gradle-9.3.1/bin:$PATH
+
+          # 4. اجرای دستور ساخت APK
+          gradle assembleDebug
     artifacts:
-      - app/build/outputs/apk/debug/*.apk
+      - "**/build/outputs/**/*.apk"
